@@ -20,9 +20,10 @@ def et_to_calender(et):
 def true_sun(et):
     rotmat = tete_to_j2000_rotmat(et)
     sunJ2000 = sun_gcrs(et)
+    raJ2000, decJ2000, _ = car2sph(sunJ2000)
     sun = np.matmul(rotmat, sunJ2000)
     ra, dec, r = car2sph(sun)
-    return ra, dec, r
+    return ra, dec, raJ2000, decJ2000
 
 
 def equinox(year, steps=1000):
@@ -39,8 +40,10 @@ def equinox(year, steps=1000):
 
     decs = np.zeros((len(ets),))
     ras = np.zeros((len(ets),))
+    rasJ2000 = np.zeros((len(ets),))
+    decsJ2000 = np.zeros((len(ets),))
     for i in range(len(ets)):
-        ras[i], decs[i], _ = true_sun(ets[i])
+        ras[i], decs[i], rasJ2000[i], decsJ2000[i] = true_sun(ets[i])
 
     i_summer = np.argmax(decs)
     i_winter = np.argmin(decs)
@@ -49,7 +52,7 @@ def equinox(year, steps=1000):
         i_spring, i_autumn = i1, i2
     else:
         i_spring, i_autumn = i2, i1
-    return ets, ras, decs, [i_spring, i_summer, i_autumn, i_winter]
+    return ets, ras, decs, rasJ2000, decsJ2000, [i_spring, i_summer, i_autumn, i_winter]
 
 
 def show_seasons(ets, ras, decs, inds, plot=True):
