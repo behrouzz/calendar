@@ -45,12 +45,15 @@ def create_historic_periods(since=-50000):
 
 
 def get_period(yr):
-    if yr <475:
+    if yr < 475:
         ps = create_historic_periods()
         period = ps[ps[:,0]<yr][0]
-    else:
+    elif yr > 475:
         ps = create_future_periods()
         period = ps[ps[:,0]<yr][-1]
+    else: # yr==475
+        ps = create_future_periods()
+        period = ps[0]
     return period
 
 
@@ -101,3 +104,31 @@ def matrix_days(year):
 def day_of_year(y, m, d):
     arr = matrix_days(y)
     return arr[np.logical_and((arr[:,1]==m),(arr[:,2]==d))][0][0]
+
+
+def days_between_years(y1, y2):
+    days = 0
+    y2, y1 = y2-1, y1+1 # exclude y1 & y2
+    while y2 >= y1:
+        y_days = 366 if is_leapyear(y2) else 365
+        days = days + y_days
+        y2 = y2 - 1
+    return days
+
+
+def days_between_dates(date1, date2):
+    # Note: date1 < date2
+    y1,m1,d1 = date1
+    y2,m2,d2 = date2
+    y1_days = 366 if is_leapyear(y1) else 365
+    day1 = day_of_year(y1, m1, d1)
+    day2 = day_of_year(y2, m2, d2)
+    days_y1_y2 = days_between_years(y1, y2)
+    result = days_y1_y2 + day2 + (y1_days-day1)
+    return result
+
+
+def persian_to_jd(date):
+    # must be more rapid
+    date0 = (-5334, 9, 2)
+    return 0.5 + days_between_dates(date0, date)

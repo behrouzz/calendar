@@ -36,11 +36,6 @@ def days_between_years(y1, y2):
     return days
 
 
-
-date1 = (1999, 12, 30)
-date2 = (2000, 1 , 31)
-
-
 def days_between_dates(date1, date2):
     # Note: date1 < date2
     y1,m1,d1 = date1
@@ -57,24 +52,4 @@ def days_between_dates(date1, date2):
 ##date2 = (2023, 11, 24)
 ##d = days_between_dates(date1, date2)
 ##print(d)
-
-# group of 2820 years
-# current 2820-year cycle began in 1096 CE (hejri:475)
-y = 475
-
-year = y -1
-
-leaps = []
-cycles = np.zeros((22,4))
-for i in range(21):
-    cycles[:-1, :] = [29, 33, 33, 33]
-cycles[-1, :] = [29, 33, 33, 37]
-cycles = cycles.flatten().astype(int)
-
-for c in cycles:
-    for i in range(c):
-        year += 1
-        if (i!=0) and ((i%4)==0):
-            leaps.append(year)
-        
 
