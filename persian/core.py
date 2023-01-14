@@ -17,6 +17,7 @@ period = 2  # 6115 to 8934
 """
 
 import numpy as np
+from .data import periods
 
 
 MONTHSDAYS_COMMUN = np.array([31,31,31,31,31,31, 30,30,30,30,30,29])
@@ -44,7 +45,7 @@ def create_historic_periods(since=-50000):
     return np.array(ps)
 
 
-def get_period(yr):
+def get_period_lowlevel(yr):
     if yr < 475:
         ps = create_historic_periods()
         period = ps[ps[:,0]<yr][0]
@@ -57,7 +58,51 @@ def get_period(yr):
     return period
 
 
-def leaps_in_current_period(yr):
+def get_period(yr):
+    if (yr<-50285) or (yr>=51234):
+        period = get_period_lowlevel(yr)
+    else:
+        period = periods[periods[:,0]<=yr][-1]
+    return period
+
+
+def periods_between_two_years(y1, y2):
+    p1 = get_period(y1)
+    p2 = get_period(y2)
+    ind1 = np.where(periods==p1)[0][0]
+    ind2 = np.where(periods==p2)[0][0]
+    return periods[ind1:ind2+1]
+
+
+def leaps_between_two_years(y1, y2):
+    ps = periods_between_two_years(y1, y2)
+    all_leaps = [list(leaps_in_current_period(p)) for p in ps]
+    all_leaps = [i for sublist in all_leaps for i in sublist]
+    return all_leaps
+
+
+def leaps_in_current_period(period):
+    y0 = period[0]
+
+    year = y0 -1
+
+    arr_leaps = []
+    cycles = np.zeros((22,4))
+    for i in range(21):
+        cycles[:-1, :] = [29, 33, 33, 33]
+    cycles[-1, :] = [29, 33, 33, 37]
+    cycles = cycles.flatten().astype(int)
+
+    for c in cycles:
+        for i in range(c):
+            year += 1
+            if (i!=0) and ((i%4)==0):
+                arr_leaps.append(year)
+    arr_leaps = np.array(arr_leaps)
+    return arr_leaps
+
+
+def leaps_in_period_of_this_year(yr):
     y0 = get_period(yr)[0]
 
     year = y0 -1
@@ -79,7 +124,7 @@ def leaps_in_current_period(yr):
 
 
 def is_leapyear(year):
-    arr_leaps = leaps_in_current_period(year)
+    arr_leaps = leaps_in_period_of_this_year(year)
     return year in arr_leaps
 
 
@@ -105,7 +150,7 @@ def day_of_year(y, m, d):
     arr = matrix_days(y)
     return arr[np.logical_and((arr[:,1]==m),(arr[:,2]==d))][0][0]
 
-
+"""
 def days_between_years(y1, y2):
     days = 0
     y2, y1 = y2-1, y1+1 # exclude y1 & y2
@@ -114,7 +159,17 @@ def days_between_years(y1, y2):
         days = days + y_days
         y2 = y2 - 1
     return days
+"""
 
+def days_between_years(y1, y2):
+    days = 0
+    y2, y1 = y2-1, y1+1 # exclude y1 & y2
+    all_leaps = leaps_between_two_years(y1, y2)
+    while y2 >= y1:
+        y_days = 366 if (y2 in all_leaps) else 365
+        days = days + y_days
+        y2 = y2 - 1
+    return days
 
 def days_between_dates(date1, date2):
     # Note: date1 < date2

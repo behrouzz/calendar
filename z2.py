@@ -11,4 +11,6 @@ a = a + 0.5 # at 0h
 #JD0 = 1948319 # jdt.datetime(1378,10,11, 12) = 503226
 
 
-print(persian_to_jd(date2))
+#print(persian_to_jd(date2))
+
+b = get_period(1401)
