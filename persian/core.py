@@ -103,24 +103,8 @@ def leaps_in_current_period(period):
 
 
 def leaps_in_period_of_this_year(yr):
-    y0 = get_period(yr)[0]
-
-    year = y0 -1
-
-    arr_leaps = []
-    cycles = np.zeros((22,4))
-    for i in range(21):
-        cycles[:-1, :] = [29, 33, 33, 33]
-    cycles[-1, :] = [29, 33, 33, 37]
-    cycles = cycles.flatten().astype(int)
-
-    for c in cycles:
-        for i in range(c):
-            year += 1
-            if (i!=0) and ((i%4)==0):
-                arr_leaps.append(year)
-    arr_leaps = np.array(arr_leaps)
-    return arr_leaps
+    period = get_period(yr)
+    return leaps_in_current_period(period)
 
 
 def is_leapyear(year):
@@ -150,16 +134,6 @@ def day_of_year(y, m, d):
     arr = matrix_days(y)
     return arr[np.logical_and((arr[:,1]==m),(arr[:,2]==d))][0][0]
 
-"""
-def days_between_years(y1, y2):
-    days = 0
-    y2, y1 = y2-1, y1+1 # exclude y1 & y2
-    while y2 >= y1:
-        y_days = 366 if is_leapyear(y2) else 365
-        days = days + y_days
-        y2 = y2 - 1
-    return days
-"""
 
 def days_between_years(y1, y2):
     days = 0
@@ -172,16 +146,45 @@ def days_between_years(y1, y2):
     return days
 
 def days_between_dates(date1, date2):
-    # Note: date1 < date2
     y1,m1,d1 = date1
     y2,m2,d2 = date2
+    if y1==y2:
+        if m1==m2:
+            if d1>d2:
+                raise Exception('Note: date1 < date2')
+        elif m1>m2:
+            raise Exception('Note: date1 < date2')
+    elif y1>y2:
+        raise Exception('Note: date1 < date2')
     y1_days = 366 if is_leapyear(y1) else 365
     day1 = day_of_year(y1, m1, d1)
     day2 = day_of_year(y2, m2, d2)
-    days_y1_y2 = days_between_years(y1, y2)
-    result = days_y1_y2 + day2 + (y1_days-day1)
+    if y1==y2:
+        result = day2 - day1
+    else:
+        days_y1_y2 = days_between_years(y1, y2)
+        result = days_y1_y2 + day2 + (y1_days-day1)
     return result
 
+
+def add_days(date, delta):
+    y,m,d = date
+    y_days = 366 if is_leapyear(y) else 365
+    day = day_of_year(y, m, d)
+    mat = matrix_days(y)[day:]
+    n = 0
+    new_y = y
+
+    if delta > y_days-day:
+        while n < delta:
+            new_y += 1
+            new_mat = matrix_days(new_y)
+            n = len(mat) + len(new_mat)
+            if n > delta:
+                mat = np.vstack((mat, new_mat))[:delta]
+            else:
+                mat = np.vstack((mat, new_mat))
+    return (new_y, mat[-1, 1], mat[-1, 2])
 
 def persian_to_jd(date):
     # must be more rapid
