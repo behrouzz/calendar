@@ -184,9 +184,20 @@ def add_days(date, delta):
                 mat = np.vstack((mat, new_mat))[:delta]
             else:
                 mat = np.vstack((mat, new_mat))
-    return (new_y, mat[-1, 1], mat[-1, 2])
+        return (new_y, mat[-1, 1], mat[-1, 2])
+    elif delta==0:
+        return date
+    else:
+        return (new_y, mat[delta-1,1], mat[delta-1,2])
+    
 
 def persian_to_jd(date):
     # must be more rapid
     date0 = (-5334, 9, 2)
     return 0.5 + days_between_dates(date0, date)
+
+
+def jd_to_persian(jd):
+    date0 = (-5334, 9, 2)
+    jd = int(jd) # felan!!!
+    return add_days(date0, jd)
