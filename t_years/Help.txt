@@ -1,0 +1,21 @@
+vernam equinox of 2000:
+-----------------------
+2000 MAR 20 07:34:59.6270039733 UTC
+or: ET0 = 6809763.812612681
+
+So, I define ET0 as the origin of time.
+
+1999 MAR 21 01:46:30.5389961376
+2000 MAR 20 07:34:59.6270039733
+2001 MAR 20 13:31:01.1989628076
+
+-24747145.275395036
+6809763.812612681
+38367125.384571426
+
+
+
+
+# https://www.thetropicalevents.com/
+# http://web.archive.org/web/20010502085156/http://home.earthlink.net/~scassidy/
+
