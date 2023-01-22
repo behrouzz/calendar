@@ -7,7 +7,7 @@ KPL/MK
 
    PATH_SYMBOLS    = ( 'KKK' )
 
-   KERNELS_TO_LOAD = ( '$KKK/de441_part-1.bsp' )
+   KERNELS_TO_LOAD = ( '$KKK/de441_part-1.bsp', '$KKK/naif0012.tls' )
 
 
  
