@@ -5,7 +5,8 @@ import pickle
 import matplotlib.pyplot as plt
 
 
-adr = 'C:/Users/H21/Desktop/Desktop/Behrouz/Astronomy/kernels/'
+#adr = 'C:/Users/H21/Desktop/Desktop/Behrouz/Astronomy/kernels/'
+adr = 'C:/Moi/_py/Astronomy/Solar System/kernels/'
 kernels = glob(adr+'naif*.tls') + [
     #adr+'de440.bsp',
     adr+'de441_part-1.bsp',
@@ -29,7 +30,19 @@ arr = np.sort(arr)
 
 dt = (arr[:-1] - arr[1:])
 
-plt.plot(dt[:1000]/86400)
+N = 500
+#x = range(N)
+#y = (dt[:N]).mean() - (dt[:N])
+x = range(len(dt))
+y = dt.mean() - dt
+
+
+fft = np.fft.fft(y)
+a = np.abs(fft)
+
+plt.plot(x, y, alpha=0.5)
+#plt.scatter(x, y, c='r', s=10, alpha=0.5)
+plt.grid()
 plt.show()
 
 ##et = float(files[0].split('_')[-1])
