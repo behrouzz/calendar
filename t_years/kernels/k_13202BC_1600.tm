@@ -3,7 +3,7 @@ KPL/MK
 
 \begindata
 
-   PATH_VALUES     = ( 'C:\Users\H21\Desktop\Desktop\Behrouz\Astronomy\kernels' )
+   PATH_VALUES     = ( 'C:\Moi\_py\Astronomy\Solar System\kernels' )
 
    PATH_SYMBOLS    = ( 'KKK' )
 

@@ -3,11 +3,11 @@ KPL/MK
 
 \begindata
 
-   PATH_VALUES     = ( 'C:\Users\H21\Desktop\Desktop\Behrouz\Astronomy\kernels' )
+   PATH_VALUES     = ( 'C:\Moi\_py\Astronomy\Solar System\kernels' )
 
    PATH_SYMBOLS    = ( 'KKK' )
 
-   KERNELS_TO_LOAD = ( '$KKK/de441_part-2.bsp' )
+   KERNELS_TO_LOAD = ( '$KKK/de441_part-2.bsp', '$KKK/naif0012.tls' )
 
 
  
