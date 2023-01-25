@@ -60,7 +60,6 @@ t_ver = np.array(t_ver)
 #=====================================================
 sp.kclear()
 
-
 with open(f"data/{t_ver[0]}_{t_ver[-1]}", 'wb') as f:
     pickle.dump(t_ver, f)
 
