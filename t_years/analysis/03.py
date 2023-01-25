@@ -22,7 +22,8 @@ y = dt.mean() - dt
 fft = np.fft.fft(y)
 a = np.abs(fft)
 
-plt.plot(year[i_after2000-1], a[i_after2000-1])
+#plt.plot(year[i_after2000-1], a[i_after2000-1])
+plt.plot(a)
 plt.grid()
 plt.show()
 
