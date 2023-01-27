@@ -145,6 +145,7 @@ def days_between_years(y1, y2):
         y2 = y2 - 1
     return days
 
+
 def days_between_dates(date1, date2):
     y1,m1,d1 = date1
     y2,m2,d2 = date2
@@ -167,7 +168,7 @@ def days_between_dates(date1, date2):
     return result
 
 
-def add_days(date, delta):
+def __add_days(date, delta):
     y,m,d = date
     y_days = 366 if is_leapyear(y) else 365
     day = day_of_year(y, m, d)
@@ -190,6 +191,41 @@ def add_days(date, delta):
     else:
         return (new_y, mat[delta-1,1], mat[delta-1,2])
     
+
+def __sub_days(date, delta):
+    y,m,d = date
+    y_days = 366 if is_leapyear(y) else 365
+    day = day_of_year(y, m, d)
+    n = 0
+    new_y = y
+    mat = matrix_days(y)[:day]
+
+    while True:
+        if abs(delta) > len(mat):
+            new_y -= 1
+            new_mat = matrix_days(new_y)
+            mat = np.vstack((new_mat, mat))
+            if len(mat) > abs(delta):
+                result = tuple([new_y]+list(mat[delta-1, 1:]))
+                break
+            elif len(mat) == abs(delta):
+                result = tuple([new_y-1]+list(matrix_days(new_y-1)[-1,1:]))
+                break
+        elif abs(delta) == len(mat):
+            result = tuple([y-1]+list(matrix_days(y-1)[-1,1:]))
+            break
+        else: # abs(delta) < len(mat)
+            result = tuple([y]+list(mat[delta-1, 1:]))
+            break
+    return result
+
+
+def add_days(date, delta):
+    if delta < 0:
+        return __sub_days(date, delta)
+    else:
+        return __add_days(date, delta)
+
 
 def persian_to_jd(date):
     # must be more rapid
