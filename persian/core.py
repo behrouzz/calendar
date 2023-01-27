@@ -97,7 +97,7 @@ def days_between_dates(date1, date2, official=True):
     return result
 
 
-def add_days(date, delta, official=True): # age manfi bashe qalat javab mide
+def __add_days(date, delta, official=True):
     y,m,d = date
     y_days = 366 if is_leapyear(y, official) else 365
     day = day_of_year(y, m, d, official)
@@ -120,6 +120,41 @@ def add_days(date, delta, official=True): # age manfi bashe qalat javab mide
     else:
         return (new_y, mat[delta-1,1], mat[delta-1,2])
     
+
+def __sub_days(date, delta, official=True):
+    y,m,d = date
+    y_days = 366 if is_leapyear(y, official) else 365
+    day = day_of_year(y, m, d, official)
+    n = 0
+    new_y = y
+    mat = matrix_days(y, official)[:day]
+
+    while True:
+        if abs(delta) > len(mat):
+            new_y -= 1
+            new_mat = matrix_days(new_y, official)
+            mat = np.vstack((new_mat, mat))
+            if len(mat) > abs(delta):
+                result = tuple([new_y]+list(mat[delta-1, 1:]))
+                break
+            elif len(mat) == abs(delta):
+                result = tuple([new_y-1]+list(matrix_days(new_y-1)[-1,1:]))
+                break
+        elif abs(delta) == len(mat):
+            result = tuple([y-1]+list(matrix_days(y-1)[-1,1:]))
+            break
+        else: # abs(delta) < len(mat)
+            result = tuple([y]+list(mat[delta-1, 1:]))
+            break
+    return result
+
+
+def add_days(date, delta, official=True):
+    if delta < 0:
+        return __sub_days(date, delta, official)
+    else:
+        return __add_days(date, delta, official)
+
 
 def persian_to_jd(date, official=True):
     # must be more rapid
