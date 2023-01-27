@@ -1,30 +1,36 @@
 from persian import *
-import jdatetime as jdt
-from datetime import datetime, timedelta
 
-def is_official_leap(year):
-    r = year % 33
-    kabiseh = False
-    
-    if (year>=1244) and (year<=1342):
-        if r in [1,5,9,13,17,21,26,30]:
-            kabiseh = True
-    elif (year>=1343) and (year<=1472):
-        if r in [1,5,9,13,17,22,26,30]:
-            kabiseh = True
+
+date = (1400, 1, 3)
+delta = -367
+official = True
+
+
+
+y,m,d = date
+
+y_days = 366 if is_leapyear(y, official) else 365
+
+day = day_of_year(y, m, d, official)
+
+#mat = matrix_days(y, official)[:day] # HAZF SHAVAD
+
+n = 0
+new_y = y
+
+
+mat = matrix_days(y, official)[:day]
+
+while n < abs(delta):
+    print(1)
+    new_y -= 1
+    new_mat = matrix_days(new_y, official)
+    n = len(mat) + len(new_mat)
+    if n > abs(delta):
+        result = np.vstack((new_mat, mat))[delta-1]
+        #break
     else:
-        raise Exception('Valid years: from 1244 to 1472')
-    return kabiseh
+        mat = np.vstack((new_mat, mat))
+#result = (new_y, mat[-1, 1], mat[-1, 2])
+#print(result)
 
-
-for y in range(1244, 1473):
-    if is_official_leap(y):
-        print(y)
-
-"""
-To be read:
-- article of Mousa Akrami
-- wikipedia: Mean tropical year
-- wikipedian: گاه‌شماری هجری خورشیدی حسابی
-- some article in downloads folder
-"""

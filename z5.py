@@ -1,37 +1,31 @@
-import numpy as np
 from persian import *
-import jdatetime as jdt
-from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
-
-def get_T(t):
-    t0 = datetime(2000, 1, 1, 12)
-    days = (t-t0).total_seconds()/86400
-    return days / 36525
 
 
-def mean_tropical_year(T):
-    """
-    Length of a tropical year in ephemeris days, between 8000 BC and 12000 AD
+date = (1400, 1, 3)
+delta = -367
+official = True
 
-    Note: T is in Julian centuries of 36,525 days of 86,400 SI seconds,
-    measured from noon January 1, 2000 TT.
-    Ref: https://en.wikipedia.org/wiki/Tropical_year
-    """
-    return 365.2421896698 - 6.15359*1e-6*T - 7.29*1e-10*T**2 + 2.64*1e-10*T**3
 
-from hypatie.coordinates import DECdms
 
-def sun_mean_longtitude(T):
-    # T = (JD - 2451545) / 36525
-    return T
+y,m,d = date
+y_days = 366 if is_leapyear(y, official) else 365
+day = day_of_year(y, m, d, official)
 
-a = DECdms('+', d=280, m=27, s=59.2146)
-b = a.deg
-print(b)
+n = 0
+new_y = y
 
-# Newcomb & Laskar's expression chi hastan???
 
-# https://en.wikipedia.org/wiki/VSOP_model
-# https://cdsarc.cds.unistra.fr/ftp/cats/VI/81/ReadMe
-# https://cdsarc.cds.unistra.fr/ftp/cats/VI/81/vsop87.txt
+mat = matrix_days(y, official)[:day]
+
+while True:
+    if abs(delta) > len(mat):
+        new_y -= 1
+        new_mat = matrix_days(new_y, official)
+        mat = np.vstack((new_mat, mat))
+        if len(mat) > abs(delta):
+            result = mat[delta-1]
+            break
+
+#result = (new_y, mat[-1, 1], mat[-1, 2])
+#print(result)
+

@@ -17,103 +17,32 @@ period = 2  # 6115 to 8934
 """
 
 import numpy as np
-from .data import periods
-
+from .data import periods, official_leaps
+from.birashk import leaps_in_period_of_this_year
 
 MONTHSDAYS_COMMUN = np.array([31,31,31,31,31,31, 30,30,30,30,30,29])
 MONTHSDAYS_LEAPS  = np.array([31,31,31,31,31,31, 30,30,30,30,30,30])
 
-
-def create_future_periods(until=50000):
-    ps = []
-    t1 = 475
-    while t1<until:
-        t2 = t1 + 2819
-        ps.append([t1, t2])
-        t1 = t2 + 1
-    return np.array(ps)
-    
-
-def create_historic_periods(since=-50000):
-    ps = []
-    t2 = 475 - 1
-    while t2>since:
-        t1 = t2 - 2819
-        ps.append([t1, t2])
-        #t1 = t2 + 1
-        t2 = t1 - 1
-    return np.array(ps)
+MIN = (1206, 1 , 1 ) # 1827 MARS ?
+MAX = (1498, 12, 30) # 2120 MARS ?
 
 
-def get_period_lowlevel(yr):
-    if yr < 475:
-        ps = create_historic_periods()
-        period = ps[ps[:,0]<yr][0]
-    elif yr > 475:
-        ps = create_future_periods()
-        period = ps[ps[:,0]<yr][-1]
-    else: # yr==475
-        ps = create_future_periods()
-        period = ps[0]
-    return period
-
-
-def get_period(yr):
-    if (yr<-50285) or (yr>=51234):
-        period = get_period_lowlevel(yr)
+def is_leapyear(year, official=True):
+    if official:
+        return year in official_leaps
     else:
-        period = periods[periods[:,0]<=yr][-1]
-    return period
+        arr_leaps = leaps_in_period_of_this_year(year)
+        return year in arr_leaps
 
 
-def periods_between_two_years(y1, y2):
-    p1 = get_period(y1)
-    p2 = get_period(y2)
-    ind1 = np.where(periods==p1)[0][0]
-    ind2 = np.where(periods==p2)[0][0]
-    return periods[ind1:ind2+1]
+def leaps_between_two_years(y1, y2, official=True):
+    if official:
+        return official_leaps[np.logical_and(official_leaps>=y1,official_leaps<y2)]
 
 
-def leaps_between_two_years(y1, y2):
-    ps = periods_between_two_years(y1, y2)
-    all_leaps = [list(leaps_in_current_period(p)) for p in ps]
-    all_leaps = [i for sublist in all_leaps for i in sublist]
-    return all_leaps
 
-
-def leaps_in_current_period(period):
-    y0 = period[0]
-
-    year = y0 -1
-
-    arr_leaps = []
-    cycles = np.zeros((22,4))
-    for i in range(21):
-        cycles[:-1, :] = [29, 33, 33, 33]
-    cycles[-1, :] = [29, 33, 33, 37]
-    cycles = cycles.flatten().astype(int)
-
-    for c in cycles:
-        for i in range(c):
-            year += 1
-            if (i!=0) and ((i%4)==0):
-                arr_leaps.append(year)
-    arr_leaps = np.array(arr_leaps)
-    return arr_leaps
-
-
-def leaps_in_period_of_this_year(yr):
-    period = get_period(yr)
-    return leaps_in_current_period(period)
-
-
-def is_leapyear(year):
-    arr_leaps = leaps_in_period_of_this_year(year)
-    return year in arr_leaps
-
-
-def matrix_days(year):
-    if is_leapyear(year):
+def matrix_days(year, official=True):
+    if is_leapyear(year, official):
         monthsdays = MONTHSDAYS_LEAPS
     else:
         monthsdays = MONTHSDAYS_COMMUN
@@ -130,22 +59,23 @@ def matrix_days(year):
     return arr
 
 
-def day_of_year(y, m, d):
-    arr = matrix_days(y)
+def day_of_year(y, m, d, official=True):
+    arr = matrix_days(y, official)
     return arr[np.logical_and((arr[:,1]==m),(arr[:,2]==d))][0][0]
 
 
-def days_between_years(y1, y2):
+def days_between_years(y1, y2, official=True):
     days = 0
     y2, y1 = y2-1, y1+1 # exclude y1 & y2
-    all_leaps = leaps_between_two_years(y1, y2)
+    all_leaps = leaps_between_two_years(y1, y2, official)
     while y2 >= y1:
         y_days = 366 if (y2 in all_leaps) else 365
         days = days + y_days
         y2 = y2 - 1
     return days
 
-def days_between_dates(date1, date2):
+
+def days_between_dates(date1, date2, official=True):
     y1,m1,d1 = date1
     y2,m2,d2 = date2
     if y1==y2:
@@ -156,29 +86,29 @@ def days_between_dates(date1, date2):
             raise Exception('Note: date1 < date2')
     elif y1>y2:
         raise Exception('Note: date1 < date2')
-    y1_days = 366 if is_leapyear(y1) else 365
-    day1 = day_of_year(y1, m1, d1)
-    day2 = day_of_year(y2, m2, d2)
+    y1_days = 366 if is_leapyear(y1, official) else 365
+    day1 = day_of_year(y1, m1, d1, official)
+    day2 = day_of_year(y2, m2, d2, official)
     if y1==y2:
         result = day2 - day1
     else:
-        days_y1_y2 = days_between_years(y1, y2)
+        days_y1_y2 = days_between_years(y1, y2, official)
         result = days_y1_y2 + day2 + (y1_days-day1)
     return result
 
 
-def add_days(date, delta):
+def add_days(date, delta, official=True): # age manfi bashe qalat javab mide
     y,m,d = date
-    y_days = 366 if is_leapyear(y) else 365
-    day = day_of_year(y, m, d)
-    mat = matrix_days(y)[day:]
+    y_days = 366 if is_leapyear(y, official) else 365
+    day = day_of_year(y, m, d, official)
+    mat = matrix_days(y, official)[day:]
     n = 0
     new_y = y
 
     if delta > y_days-day:
         while n < delta:
             new_y += 1
-            new_mat = matrix_days(new_y)
+            new_mat = matrix_days(new_y, official)
             n = len(mat) + len(new_mat)
             if n > delta:
                 mat = np.vstack((mat, new_mat))[:delta]
@@ -191,13 +121,13 @@ def add_days(date, delta):
         return (new_y, mat[delta-1,1], mat[delta-1,2])
     
 
-def persian_to_jd(date):
+def persian_to_jd(date, official=True):
     # must be more rapid
     date0 = (-5334, 9, 2)
-    return 0.5 + days_between_dates(date0, date)
+    return 0.5 + days_between_dates(date0, date, official)
 
 
-def jd_to_persian(jd):
-    date0 = (-5334, 9, 2)
-    jd = int(jd) # felan!!!
-    return add_days(date0, jd)
+def jd_to_persian(jd, official=True):
+    date0 = (1378, 10, 11)
+    jd0 = 2451544.5
+    return add_days(date0, round(jd-jd0), official)
