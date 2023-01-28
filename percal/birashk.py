@@ -17,7 +17,7 @@ period = 2  # 6115 to 8934
 """
 
 import numpy as np
-from .data import periods
+from .data import periods, per_jul, jul_per
 
 
 MONTHSDAYS_COMMUN = np.array([31,31,31,31,31,31, 30,30,30,30,30,29])
@@ -228,12 +228,17 @@ def add_days(date, delta):
 
 
 def persian_to_jd(date):
-    # must be more rapid
-    date0 = (-5334, 9, 2)
-    return 0.5 + days_between_dates(date0, date)
+    y = date[0]
+    y0 = y - (y%1000)
+    jd0 = per_jul[y0]
+    date0 = (y0, 1, 1)
+    dt = days_between_dates(date0, date)
+    return jd0 + dt
 
 
 def jd_to_persian(jd):
-    date0 = (-5334, 9, 2)
-    jd = int(jd) # felan!!!
-    return add_days(date0, jd)
+    arr = np.array(list(per_jul.values()))
+    jd0 = arr[arr<=jd].max()
+    y0 = jul_per[jd0]
+    date0 = (y0, 1, 1)
+    return add_days(date0, int(jd-jd0))
