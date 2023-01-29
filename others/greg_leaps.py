@@ -12,6 +12,7 @@ the day starting at 12:00 UT (noon) on January 1, 2000, was 2451545.
 
 import numpy as np
 from datetime import datetime, timedelta
+import calendar
 
 def is_leap(y):
     c1 = (y%4 == 0)
@@ -53,3 +54,17 @@ def days_between_dates(date1, date2):
 ##d = days_between_dates(date1, date2)
 ##print(d)
 
+
+
+#t0 = datetime(1,1,1)
+#years = [t0 + timedelta(days=i) for i in range(2000*400)]
+
+#c = calendar.Calendar()
+#c = calendar.TextCalendar()
+
+for y in range(1, 2100):
+    kh = is_leap(y)
+    a = calendar.isleap(y)
+    #if kh!=a:
+    if (kh + a)==1:
+        print(y)
