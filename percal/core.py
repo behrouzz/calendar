@@ -9,6 +9,11 @@ from .gregorian import day_of_year as gre_day_of_year
 from .gregorian import jd_to_gregorian, gregorian_to_jd
 
 
+def et2jd(et):
+    J2000 = 2451545.0
+    return J2000 + (et / 86400)
+
+
 def persian_from_jd(jd):
     y,m,d = jd_to_persian(jd)
     return Persian(y,m,d)
