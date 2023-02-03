@@ -20,7 +20,8 @@ def dec_sun(et):
     return dec_2000, dec_date
 
 
-ET, TIME, GY, GM, GD, PY = pd.read_csv('data/equinox_time.csv').iloc[5000]
+file = '../t_years/analysis/equinox_time.csv'
+ET, TIME, GY, GM, GD, PY = pd.read_csv(file).iloc[5000]
 JD = (ET/86400) + 2451545.0
 
 et1 = ET - 10000

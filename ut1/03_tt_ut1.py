@@ -11,3 +11,9 @@ df['UT1-TT'] = df['UT1-TAI'] - 32.184
 
 plt.plot(df['jd'], df['UT1-TT'])
 plt.show()
+
+"""
+Date__(UT)__HR:MN:SS, Date_________JDUT
+
+b9998-Jan-01 00:00:00, -1930346.5
+"""
