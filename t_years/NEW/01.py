@@ -2,8 +2,11 @@
 
 import ctypes as ct
 import numpy as np
+import os
 
-lib = ct.CDLL("C:/Users/behro/Desktop/JUST_TEST/Mov/c/Library/05_SOFA_nut_kh/py/nut.so")
+current_folder = os.getcwd()
+
+lib = ct.CDLL(current_folder + '/nut.so')
 
 func = lib.rotmat_2006a
 
@@ -51,8 +54,10 @@ def get_sun_gcrs(et):
     pos, _ = sp.spkez(10, et, 'J2000', 'LT+S', 399)
     return pos[:3] #GCRS
 
-
-sp.furnsh('kernel.tm')
+kernels = 'C:/Moi/_py/Astronomy/Solar System/kernels/'
+#sp.furnsh(kernels+'de441_part-1.bsp')
+sp.furnsh(kernels+'de441_part-2.bsp')
+sp.furnsh(kernels+'naif0012.tls')
 
 jd = 2454000
 et = sp.str2et('JD' + str(jd) + 'UTC') #TDT, TDB
