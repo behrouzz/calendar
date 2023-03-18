@@ -65,7 +65,7 @@ sp.furnsh(kernels+'naif0012.tls')
 def get_min_index(JDS):
     DECS = []
     for JD in JDS:
-        et = sp.str2et('JD' + str(JD) + 'UTC')
+        et = sp.str2et('JD' + str(JD) + 'TDT')
         pos_gcrs = get_sun_gcrs(et)
         pos_tete = gcrs_to_tete(pos_gcrs, JD)
         ra, dec, r = car2sph(pos_tete)
@@ -98,13 +98,13 @@ t1 = time.time()
 t2 = time.time()
 print(t2-t1)
 
-##jd_utc = vernal_2000
-##et = sp.str2et('JD' + str(jd_utc) + 'UTC')
-###a = sp.et2utc(et, 'J', 14, 30)
-##a = sp.etcal(et, 100)
-##b = sp.str2et(a + ' TDB')
-##print(b)
-
+count = sp.ktotal('ALL')
+files = []
+for i in range(count):
+    file, type, source, handle = sp.kdata(i, 'ALL')
+    files.append(file)
+adr = '/'.join(files[0].split('/')[:-1]) + '/'
+filenames = [i.split('/')[-1] for i in files]
 #------------------------------------------
 sp.kclear()
 
