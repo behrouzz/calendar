@@ -95,17 +95,14 @@ def run(jd0):
 vernal_2000 = 2451623.8159813415
 
 t1 = time.time()
-#ers = run(vernal_2000)
+vers = run(vernal_2000)
 t2 = time.time()
 print(t2-t1)
 
-count = sp.ktotal('ALL')
-files = []
-for i in range(count):
-    file, type, source, handle = sp.kdata(i, 'ALL')
-    files.append(file)
-adr = '/'.join(files[0].split('/')[:-1]) + '/'
-filenames = [i.split('/')[-1] for i in files]
+file = open('data/data.txt', 'a')
+for i in vers:
+    file.write(str(i)+'\n')
+file.close()
 #------------------------------------------
 sp.kclear()
 

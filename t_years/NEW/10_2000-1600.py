@@ -84,7 +84,7 @@ def kh_interpolate(x, y, guess):
 
 def run(jd0):
     vernals = []
-    for years in range(100):
+    while jd0 > 2305447.4995233: # 1600 JAN 1 00:00:00 TDT
         jds = np.linspace(jd0-365.4, jd0-365.1, 1000)
         i_min, decs = get_min_index(jds)
         jd0 = kh_interpolate(x=jds, y=decs, guess=jds[i_min])
@@ -95,17 +95,16 @@ def run(jd0):
 vernal_2000 = 2451623.8159813415
 
 t1 = time.time()
-#ers = run(vernal_2000)
+vers = run(vernal_2000)
 t2 = time.time()
 print(t2-t1)
 
-count = sp.ktotal('ALL')
-files = []
-for i in range(count):
-    file, type, source, handle = sp.kdata(i, 'ALL')
-    files.append(file)
-adr = '/'.join(files[0].split('/')[:-1]) + '/'
-filenames = [i.split('/')[-1] for i in files]
+file = open('data/2000-1600.txt', 'a')
+for i,v in enumerate(vers):
+    file.write(str(2000-1-i)+','+str(v)+'\n')
+file.close()
+
 #------------------------------------------
 sp.kclear()
 
+#https://ssd.jpl.nasa.gov/tools/jdc/#/jd
